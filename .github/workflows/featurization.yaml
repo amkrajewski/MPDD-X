@@ -21,20 +21,18 @@ jobs:
         conda create --name Featurization python=3.10
         conda init bash
 
+    - name: Install dependencies
+      run: |
+        source $HOME/miniforge3/etc/profile.d/conda.sh
+        conda activate Featurization
+        conda env update --file featurization/environment.yaml --name Featurization
+
     - name: Cache Conda
       id: cache-conda
       uses: actions/cache@v3
       with:
         path: ~/miniforge3/envs/
         key: ${{ runner.os }}-conda-${{ hashFiles('featurization/environment.yaml') }}
-
-    - name: Create and activate Conda environment
-      run: |
-        source $HOME/miniforge3/etc/profile.d/conda.sh
-        conda activate Featurization
-        if [[ ! -d "$CONDA_PREFIX" ]]; then
-          conda env update --file featurization/environment.yaml --name Featurization
-        fi
 
     - name: Test that pysipfenn is available
       run: python -c "import pysipfenn; c = pysipfenn.Calculator()"
