@@ -40,8 +40,9 @@ jobs:
       id: download
       run: |
         if [ -n "${{ steps.respond.outputs.result }}" ]; then
-          curl -O ${{ steps.respond.outputs.result }} || echo "downloaded=false" >> $GITHUB_ENV
+          curl -O ${{ steps.respond.outputs.result }} && echo "downloaded=true" >> $GITHUB_ENV || echo "downloaded=false" >> $GITHUB_ENV
         fi
+        
     - name: Send message if download failed
       uses: actions/github-script@v5
       if: env.downloaded == 'false'
@@ -58,7 +59,7 @@ jobs:
           });
 
     - name: Unzip file
-      if: steps.respond.outputs.result != ''
+      if: env.downloaded == 'true'
       run: |
         mkdir -p structures
         unzip "${{ steps.respond.outputs.result }}" -d structures
