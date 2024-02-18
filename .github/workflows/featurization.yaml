@@ -15,14 +15,14 @@ jobs:
       with:
         auto-update-conda: true
         python-version: "3.10"
-        miniconda-version: "latest"
+        miniforge-version: "latest"
 
     - name: Cache Conda
       id: cache-conda
       uses: actions/cache@v3
       with:
         path: ~/miniconda/envs/
-        key: ${{ runner.os }}-conda-${{ hashFiles('featurization/environment.yml') }}
+        key: ${{ runner.os }}-conda-${{ hashFiles('featurization/environment.yaml') }}
 
     - name: Create and activate Conda environment
       run: |
