@@ -166,8 +166,22 @@ jobs:
       if: env.valid == 'true'
       uses: actions/upload-artifact@v2
       with:
-        name: descriptor-artifact
+        name: descriptor-data-npy
         path: descriptorData.npy
+
+    - name: Upload file as artifact
+      if: env.valid == 'true'
+      uses: actions/upload-artifact@v2
+      with:
+        name: descriptor-data-npy
+        path: descriptorData.csv
+
+    - name: Upload file as artifact
+      if: env.valid == 'true'
+      uses: actions/upload-artifact@v2
+      with:
+        name: results-csv
+        path: results.csv
 
     - name: Report results
       if: env.valid == 'true'
@@ -181,7 +195,7 @@ jobs:
 
           const artifactUrl = `https://github.com/${issue.owner}/${issue.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
 
-          message += `\nFor some time, you can also download the raw descriptor data array [as an Artifact here](${artifactUrl})`;
+          message += `\nFor a few days, you can also download the raw descriptor data Numpy array and results CSV [under Artifact tab here](${artifactUrl})`;
           message += `\nEnjoy!`
     
           github.rest.issues.createComment({
