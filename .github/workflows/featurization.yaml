@@ -10,26 +10,31 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Miniconda
-      uses: conda-incubator/setup-miniconda@v3
-      with:
-        auto-update-conda: true
-        python-version: "3.10"
-        miniforge-version: "latest"
+    - name: Install Miniforge
+      run: |
+        wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-MacOSX-arm64.sh
+        bash Miniforge3-MacOSX-arm64.sh -b -p $HOME/miniforge3
+        echo "$HOME/miniforge3/bin" >> $GITHUB_PATH
+
+    - name: Set up Conda
+      run: |
+        conda create --name Featurization python=3.10
+        conda init bash
 
     - name: Cache Conda
       id: cache-conda
       uses: actions/cache@v3
       with:
-        path: ~/miniconda/envs/
+        path: ~/miniforge3/envs/
         key: ${{ runner.os }}-conda-${{ hashFiles('featurization/environment.yaml') }}
 
     - name: Create and activate Conda environment
       run: |
+        source $HOME/miniforge3/etc/profile.d/conda.sh
+        conda activate Featurization
         if [[ "${{ steps.cache-conda.outputs.cache-hit }}" != 'true' ]]; then
-          conda env create --file featurization/environment.yaml
+          conda env update --file featurization/environment.yaml --name Featurization
         fi
-        echo "conda activate Featurization" >> $GITHUB_ENV
 
     - name: Test that pysipfenn is available
       run: python -c "import pysipfenn; c = pysipfenn.Calculator()"
