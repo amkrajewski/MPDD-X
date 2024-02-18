@@ -1,8 +1,12 @@
 import pysipfenn
 import numpy as np
+# Init
 c = pysipfenn.Calculator()
+# Get model and run from directory
 c.downloadModels('SIPFENN_Krajewski2022_NN30')
-c.runFromDirectory('structures', 'KS2022', 'parallel')
+c.loadModels('SIPFENN_Krajewski2022_NN30')
+c.runFromDirectory('structures', 'KS2022', 'serial')
+# Persist results
 resultArray = np.array(c.descriptorData)
 np.save('descriptorData.npy', resultArray)
 outString = f'| {" | ".join(c.get_resultDictsWithNames()[0].keys())} |\n'
