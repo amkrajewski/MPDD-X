@@ -25,10 +25,10 @@ jobs:
           let message;
           if (matches && matches.length > 0) {
             message = '👍 [1/3] I found a ZIP file linked in your comment. I will now attempt to download it and validate contents.';
-            console.log(`::set-env name=MATCH::${matches[0]}`);
+            console.log(`MATCH=${matches[0]} >> $GITHUB_ENV`);
           } else {
             message = '😢 Your comment does not contain any direct links to ZIP files. Please note that certain cloud providers do not support that. Try to directly drag-and-drop into a comment.';
-            console.log(`::set-env name=MATCH::false`);
+            console.log(`MATCH=false >> $GITHUB_ENV`);
           }
 
           github.rest.issues.createComment({
