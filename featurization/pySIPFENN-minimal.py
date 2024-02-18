@@ -12,4 +12,4 @@ for e in c.get_resultDictsWithNames():
     outString += f'| {" | ".join([str(round(v,4)) for k, v in e.items() if k != "name"])} |\n'
 print(outString)
 with open('response.md', 'w') as f:
-    f.write(outString)"
+    f.write(outString)
