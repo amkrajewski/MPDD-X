@@ -160,3 +160,47 @@ jobs:
         print(outString)
         with open('response.md', 'w') as f:
           f.write(outString)"
+
+    - name: Run another step if Python step fails
+      if: failure()
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const issue = context.issue;
+          const message = '😢 Something went wrong at the calculation step...';
+
+          github.rest.issues.createComment({
+            owner: issue.owner,
+            repo: issue.repo,
+            issue_number: issue.number,
+            body: message
+          });
+
+    - name: Upload file as artifact
+      if: env.valid == 'true'
+      uses: actions/upload-artifact@v2
+      with:
+        name: descriptor-artifact
+        path: descriptorData.npy
+
+    - name: Report results
+      if: env.valid == 'true'
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const fs = require('fs');
+          const issue = context.issue;
+          const fileContent = fs.readFileSync('response.md', 'utf8');
+          const message = `🚀 [3/3] All Done! Obtained results are in the table below: \n\n${fileContent}`;
+
+          const artifactUrl = `https://github.com/${issue.owner}/${issue.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+
+          message += `\nFor some time, you can also download the raw descriptor data array [as an Artifact here](${artifactUrl})`;
+          message += `\nEnjoy!`
+    
+          github.rest.issues.createComment({
+            owner: issue.owner,
+            repo: issue.repo,
+            issue_number: issue.number,
+            body: message
+          });
