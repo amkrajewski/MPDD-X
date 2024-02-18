@@ -22,7 +22,15 @@ jobs:
           const issueComment = context.payload.comment;
           const issueUrl = issueComment.issue_url;
 
-          const attachmentUrl = issueComment.body.match(/!\[.*\]\((.*)\)/)[1];
+          const match = issueComment.body.match(/!\[.*\]\((.*)\)/);
+          if (match === null) {
+            await github.issues.createComment({
+              issue_url: issueUrl,
+              body: '😢 No attachment found in the comment.'
+            });
+            return;
+          }
+          const attachmentUrl = match[1];
           if (!attachmentUrl.endsWith('.zip')) {
             await github.issues.createComment({
               issue_url: issueUrl,
