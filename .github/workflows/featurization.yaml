@@ -19,7 +19,7 @@ jobs:
           const fs = require('fs');
           const issueComment = context.payload.comment;
           const issue = context.issue;
-          const regex = /(https:\/\/[^\s]+\.zip)/g;
+          const regex = /(https:\/\/[^\s]+\.zip)\b/g;
           const matches = issueComment.body.match(regex);
     
           console.log('Matches:', matches);
