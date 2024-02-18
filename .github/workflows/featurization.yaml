@@ -27,6 +27,9 @@ jobs:
         conda activate Featurization
         conda env update --file featurization/environment.yml --name Featurization
 
+    - name: Check what was installed
+      run: conda list
+
     - name: Cache Conda
       id: cache-conda
       uses: actions/cache@v3
