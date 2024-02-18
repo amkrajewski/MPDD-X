@@ -11,38 +11,35 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Process comment
+    - name: Respond to comment
       uses: actions/github-script@v5
       with:
         script: |
-          const fs = require('fs');
-          const https = require('https');
-          const path = require('path');
-
           const issueComment = context.payload.comment;
-          const issueUrl = issueComment.issue_url;
+          const issue = context.issue;
+          const regex = /!\[image]\((.*?)\)/g;
+          const matches = issueComment.body.match(regex);
 
-          const match = issueComment.body.match(/!\[.*\]\((.*)\)/);
-          if (match === null) {
-            await github.issues.createComment({
-              issue_url: issueUrl,
-              body: '😢 No attachment found in the comment.'
-            });
-            return;
-          }
-          const attachmentUrl = match[1];
-          if (!attachmentUrl.endsWith('.zip')) {
-            await github.issues.createComment({
-              issue_url: issueUrl,
-              body: '😢 The attachment is not a ZIP file.'
-            });
-            return;
+          let message;
+          if (matches && matches.length > 0) {
+            message = '😄 I found an attachment in your comment. I will attempt to download it.';
+          } else {
+            message = '😢 Your comment does not contain any attachments.';
           }
 
-          const zipFile = fs.createWriteStream('attachment.zip');
-          https.get(attachmentUrl, (response) => {
-            response.pipe(zipFile);
+          github.rest.issues.createComment({
+            owner: issue.owner,
+            repo: issue.repo,
+            issue_number: issue.number,
+            body: message
           });
+
+          return matches ? matches[0].slice(10, -1) : null;
+    - name: Download attachment
+      run: |
+        if [ -n "${{ steps.respond.outputs.result }}" ]; then
+          curl -O ${{ steps.respond.outputs.result }}
+        fi
 
     - name: Unzip attachment into structures
       uses: montudor/action-zip@v1
