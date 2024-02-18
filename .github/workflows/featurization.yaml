@@ -44,10 +44,12 @@ jobs:
       id: download
       run: |
         cat match.txt
-        sed -i '' 's/\.zipLICENSE/\.zip/g' match.txt
-        cat match.txt
-        curl -o task.zip $(cat match.txt) || echo "::set-output name=failed::true"
-        ls
+        brew install wget
+        file=$(cat match.txt)
+        file=$(echo $file | sed 's/\.zipLICENSE/\.zip/g')
+        echo $file
+        wget -O task.zip $file || echo "::set-output name=failed::true"
+        fi
       shell: bash
         
     - name: Send message if download failed
