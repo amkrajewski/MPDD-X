@@ -177,7 +177,7 @@ jobs:
           const fs = require('fs');
           const issue = context.issue;
           const fileContent = fs.readFileSync('response.md', 'utf8');
-          const message = `🚀 [3/3] All Done! Obtained results are in the table below: \n\n${fileContent}`;
+          let message = `🚀 [3/3] All Done! Obtained results are in the table below: \n\n${fileContent}`;
 
           const artifactUrl = `https://github.com/${issue.owner}/${issue.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
 
