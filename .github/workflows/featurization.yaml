@@ -17,14 +17,14 @@ jobs:
         script: |
           const issueComment = context.payload.comment;
           const issue = context.issue;
-          const regex = /!\[image]\((.*?)\)/g;
+          const regex = /(https:\/\/[^\s]+\.zip)/g;
           const matches = issueComment.body.match(regex);
 
           let message;
           if (matches && matches.length > 0) {
-            message = '😄 I found an attachment in your comment. I will attempt to download it.';
+            message = '👍 [1/3] I found a ZIP file linked in your comment. I will now attempt to download it and validate contents.';
           } else {
-            message = '😢 Your comment does not contain any attachments.';
+            message = '😢 Your comment does not contain any direct links to ZIP files. Please note that certain cloud providers do not support that. Try to directly drag-and-drop into a comment.';
           }
 
           github.rest.issues.createComment({
@@ -34,12 +34,28 @@ jobs:
             body: message
           });
 
-          return matches ? matches[0].slice(10, -1) : null;
+          return matches ? matches[0] : null;
+          
     - name: Download attachment
+      id: download
       run: |
         if [ -n "${{ steps.respond.outputs.result }}" ]; then
-          curl -O ${{ steps.respond.outputs.result }}
+          curl -O ${{ steps.respond.outputs.result }} || echo "::set-output name=downloaded::false"
         fi
+    - name: Send message if download failed
+      uses: actions/github-script@v5
+      if: steps.download.outputs.downloaded == 'false'
+      with:
+        script: |
+          const issue = context.issue;
+          const message = '😢 Could not download the linked ZIP file.';
+
+          github.rest.issues.createComment({
+            owner: issue.owner,
+            repo: issue.repo,
+            issue_number: issue.number,
+            body: message
+          });
 
     - name: Unzip attachment into structures
       uses: montudor/action-zip@v1
