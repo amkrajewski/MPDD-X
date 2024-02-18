@@ -43,6 +43,7 @@ jobs:
     - name: Download file
       id: download
       run: |
+        cat match.txt
         curl -o task.zip $(cat match.txt) || echo "::set-output name=failed::true"
         ls
       shell: bash
@@ -66,6 +67,7 @@ jobs:
       if: steps.download.outputs.failed != 'true'
       run: |
         mkdir -p structures
+        ls
         unzip task.zip -d structures
         cd structures
         ls
