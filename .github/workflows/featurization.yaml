@@ -42,6 +42,11 @@ jobs:
         if [ -n "${{ steps.respond.outputs.result }}" ]; then
           curl -O ${{ steps.respond.outputs.result }} && echo "downloaded=true" >> $GITHUB_ENV || echo "downloaded=false" >> $GITHUB_ENV
         fi
+        ls
+
+    - name: Debug output
+      run: |
+        echo "Downloaded: ${{ env.downloaded }}"
         
     - name: Send message if download failed
       uses: actions/github-script@v5
