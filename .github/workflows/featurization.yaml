@@ -54,7 +54,7 @@ jobs:
       with:
         script: |
           const issue = context.issue;
-          const message = '😢 Could not download the linked ZIP file.';
+          const message = '😢 Could not download the task files. Exiting now...';
 
           github.rest.issues.createComment({
             owner: issue.owner,
@@ -74,27 +74,33 @@ jobs:
         ls
         
     - name: Verify file extensions
+      if: steps.download.outputs.failed != 'true'
       id: verify
       run: |
         shopt -s nocasematch
+        if [ ! -d "structures" ]; then
+           echo "structures directory does not exist"
+           echo "valid=false" >> $GITHUB_ENV
+           exit 0
+        fi
         if [ -z "$(ls -A structures)" ]; then
            echo "No files found in structures directory"
            echo "valid=false" >> $GITHUB_ENV
-           exit 1
+           exit 0
         fi
         for file in structures/*; do
           extension="${file##*.}"
           if [[ "$extension" != "poscar" && "$extension" != "cif" && "$extension" != "vasp" ]]; then
             echo "Invalid file extension: $file"
             echo "valid=false" >> $GITHUB_ENV
-            exit 1
+            exit 0
           fi
         done
         echo "valid=true" >> $GITHUB_ENV
         
     - name: Send message if file extensions are invalid
       uses: actions/github-script@v5
-      if: env.valid == 'false'
+      if: env.valid == 'false' && steps.download.outputs.failed != 'true'
       with:
         script: |
           const issue = context.issue;
