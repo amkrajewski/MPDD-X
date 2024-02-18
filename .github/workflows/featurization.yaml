@@ -57,36 +57,37 @@ jobs:
             body: message
           });
 
-    - name: Unzip attachment into structures
-      uses: montudor/action-zip@v1
-      with:
-        args: unzip -qq attachment.zip -d structures
-
+    - name: Unzip file
+      if: steps.respond.outputs.result != ''
+      run: |
+        mkdir -p structures
+        unzip "${{ steps.respond.outputs.result }}" -d structures
+        
     - name: Verify file extensions
+      id: verify
+      run: |
+        shopt -s nocasematch
+        for file in structures/*; do
+          extension="${file##*.}"
+          if [[ "$extension" != "poscar" && "$extension" != "cif" && "$extension" != "vasp" ]]; then
+            echo "::set-output name=valid::false"
+            break
+          fi
+        done
+        
+    - name: Send message if file extensions are invalid
       uses: actions/github-script@v5
+      if: steps.verify.outputs.valid == 'false'
       with:
         script: |
-          const fs = require('fs');
-          const path = require('path');
+          const issue = context.issue;
+          const message = '😢 The files supplied in ZIP do not have one of the required extensions: `poscar`, `cif`, or `vasp`.';
 
-          const issueComment = context.payload.comment;
-          const issueUrl = issueComment.issue_url;
-
-          const fileNames = fs.readdirSync('structures');
-          for (const fileName of fileNames) {
-            const extension = path.extname(fileName);
-            if (extension !== '.poscar' && extension !== '.cif') {
-              await github.issues.createComment({
-                issue_url: issueUrl,
-                body: '😢 Not all files have a POSCAR or CIF extension.'
-              });
-              return;
-            }
-          }
-
-          await github.issues.createComment({
-            issue_url: issueUrl,
-            body: '🎉 Received your strcuture files:\n' + fileNames.join('\n')
+          github.rest.issues.createComment({
+            owner: issue.owner,
+            repo: issue.repo,
+            issue_number: issue.number,
+            body: message
           });
 
     - name: Set up Python 3.11
