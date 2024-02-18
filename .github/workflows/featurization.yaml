@@ -27,7 +27,7 @@ jobs:
     - name: Create and activate Conda environment
       run: |
         if [[ "${{ steps.cache-conda.outputs.cache-hit }}" != 'true' ]]; then
-          conda env create --file featurization/environment.yml
+          conda env create --file featurization/environment.yaml
         fi
         echo "conda activate Featurization" >> $GITHUB_ENV
 
