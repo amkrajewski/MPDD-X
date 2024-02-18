@@ -40,11 +40,11 @@ jobs:
       id: download
       run: |
         if [ -n "${{ steps.respond.outputs.result }}" ]; then
-          curl -O ${{ steps.respond.outputs.result }} || echo "::set-output name=downloaded::false"
+          curl -O ${{ steps.respond.outputs.result }} || echo "downloaded=false" >> $GITHUB_ENV
         fi
     - name: Send message if download failed
       uses: actions/github-script@v5
-      if: steps.download.outputs.downloaded == 'false'
+      if: env.downloaded == 'false'
       with:
         script: |
           const issue = context.issue;
