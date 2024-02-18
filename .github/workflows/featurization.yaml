@@ -25,14 +25,14 @@ jobs:
       run: |
         source $HOME/miniforge3/etc/profile.d/conda.sh
         conda activate Featurization
-        conda env update --file featurization/environment.yaml --name Featurization
+        conda env update --file featurization/environment.yml --name Featurization
 
     - name: Cache Conda
       id: cache-conda
       uses: actions/cache@v3
       with:
         path: ~/miniforge3/envs/
-        key: ${{ runner.os }}-conda-${{ hashFiles('featurization/environment.yaml') }}
+        key: ${{ runner.os }}-conda-${{ hashFiles('featurization/environment.yml') }}
 
     - name: Test that pysipfenn is available
       run: python -c "import pysipfenn; c = pysipfenn.Calculator()"
