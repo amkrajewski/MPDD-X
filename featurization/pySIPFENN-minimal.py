@@ -9,6 +9,7 @@ c.runFromDirectory('structures', 'KS2022', 'serial')
 # Persist results
 resultArray = np.array(c.descriptorData)
 np.save('descriptorData.npy', resultArray)
+c.writeDescriptorsToCSV('KS2022', 'descriptorData.csv')
 outString = f'| {" | ".join(c.get_resultDictsWithNames()[0].keys())} |\n'
 outString += f'| {" | ".join(["---" for _ in c.get_resultDictsWithNames()[0].keys()])} |\n'
 for e in c.get_resultDictsWithNames():
@@ -17,3 +18,4 @@ for e in c.get_resultDictsWithNames():
 print(outString)
 with open('response.md', 'w') as f:
     f.write(outString)
+c.writeResultsToCSV('results.csv')
