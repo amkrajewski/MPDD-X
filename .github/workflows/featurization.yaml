@@ -43,7 +43,8 @@ jobs:
     - name: Download file
       id: download
       run: |
-        curl -O $(cat match.txt) || echo "::set-output name=failed::true"
+        curl -o task.zip $(cat match.txt) || echo "::set-output name=failed::true"
+        ls
       shell: bash
         
     - name: Send message if download failed
@@ -65,7 +66,7 @@ jobs:
       if: steps.download.outputs.failed != 'true'
       run: |
         mkdir -p structures
-        unzip "${{ steps.respond.outputs.result }}" -d structures
+        unzip task.zip -d structures
         cd structures
         ls
         
