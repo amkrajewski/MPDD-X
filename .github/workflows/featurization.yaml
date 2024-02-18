@@ -20,6 +20,8 @@ jobs:
           const regex = /(https:\/\/[^\s]+\.zip)/g;
           const matches = issueComment.body.match(regex);
 
+          console.log('Matches:', matches);
+
           let message;
           if (matches && matches.length > 0) {
             message = '👍 [1/3] I found a ZIP file linked in your comment. I will now attempt to download it and validate contents.';
@@ -34,11 +36,14 @@ jobs:
             body: message
           });
 
-          return matches ? matches[0] : null;
+          const result = matches ? matches[0] : null;
+          console.log('Result:', result);
+          return result;
           
     - name: Download attachment
       id: download
       run: |
+        echo "URL: '${{ steps.respond.outputs.result }}'"
         if [ -n "${{ steps.respond.outputs.result }}" ]; then
           curl -O ${{ steps.respond.outputs.result }} && echo "downloaded=true" >> $GITHUB_ENV || echo "downloaded=false" >> $GITHUB_ENV
         fi
