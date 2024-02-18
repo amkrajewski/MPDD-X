@@ -1,14 +1,72 @@
 name: FeaturizationWorker
 
 on: 
+  issue_comment:
+    types: [created]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: macos-14
-
     steps:
     - uses: actions/checkout@v4
+
+    - name: Process comment
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const fs = require('fs');
+          const https = require('https');
+          const path = require('path');
+
+          const issueComment = context.payload.comment;
+          const issueUrl = issueComment.issue_url;
+
+          const attachmentUrl = issueComment.body.match(/!\[.*\]\((.*)\)/)[1];
+          if (!attachmentUrl.endsWith('.zip')) {
+            await github.issues.createComment({
+              issue_url: issueUrl,
+              body: '😢 The attachment is not a ZIP file.'
+            });
+            return;
+          }
+
+          const zipFile = fs.createWriteStream('attachment.zip');
+          https.get(attachmentUrl, (response) => {
+            response.pipe(zipFile);
+          });
+
+    - name: Unzip attachment into structures
+      uses: montudor/action-zip@v1
+      with:
+        args: unzip -qq attachment.zip -d structures
+
+    - name: Verify file extensions
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+
+          const issueComment = context.payload.comment;
+          const issueUrl = issueComment.issue_url;
+
+          const fileNames = fs.readdirSync('structures');
+          for (const fileName of fileNames) {
+            const extension = path.extname(fileName);
+            if (extension !== '.poscar' && extension !== '.cif') {
+              await github.issues.createComment({
+                issue_url: issueUrl,
+                body: '😢 Not all files have a POSCAR or CIF extension.'
+              });
+              return;
+            }
+          }
+
+          await github.issues.createComment({
+            issue_url: issueUrl,
+            body: '🎉 Received your strcuture files:\n' + fileNames.join('\n')
+          });
 
     - name: Set up Python 3.11
       uses: actions/setup-python@v5
