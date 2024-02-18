@@ -18,14 +18,14 @@ jobs:
 
     - name: Set up Conda
       run: |
-        conda create --name Featurization python=3.10
+        conda create --name featurization python=3.10
         conda init bash
 
     - name: Install dependencies
       run: |
         source $HOME/miniforge3/etc/profile.d/conda.sh
-        conda activate Featurization
-        conda env update --file featurization/environment.yml --name Featurization
+        conda activate featurization
+        conda install -c conda-forge pysipfenn=0.13.1 numpy=1.25 pymatgen=2024.2.8 spglib=2.0.2 pymongo=4.6
 
     - name: Check what was installed
       run: conda list
@@ -35,7 +35,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: ~/miniforge3/envs/
-        key: ${{ runner.os }}-conda-${{ hashFiles('featurization/environment.yml') }}
+        key: ${{ runner.os }}-conda-featurization
 
     - name: Test that pysipfenn is available
       run: python -c "import pysipfenn; c = pysipfenn.Calculator()"
