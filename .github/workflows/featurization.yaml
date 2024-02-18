@@ -70,6 +70,7 @@ jobs:
         ls
         unzip task.zip -d structures
         cd structures
+        rm -rf __MACOSX
         ls
         
     - name: Verify file extensions
