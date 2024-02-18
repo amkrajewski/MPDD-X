@@ -70,14 +70,16 @@ jobs:
         for file in structures/*; do
           extension="${file##*.}"
           if [[ "$extension" != "poscar" && "$extension" != "cif" && "$extension" != "vasp" ]]; then
-            echo "::set-output name=valid::false"
-            break
+            echo "Invalid file extension: $file"
+            echo "valid=false" >> $GITHUB_ENV
+            exit 1
           fi
         done
+        echo "valid=true" >> $GITHUB_ENV
         
     - name: Send message if file extensions are invalid
       uses: actions/github-script@v5
-      if: steps.verify.outputs.valid == 'false'
+      if: env.valid == 'false'
       with:
         script: |
           const issue = context.issue;
@@ -92,14 +94,17 @@ jobs:
 
     - name: Set up Python 3.11
       uses: actions/setup-python@v5
+      if: env.valid == 'true'
       with:
         python-version: "3.11"
         cache: 'pip'
         cache-dependency-path: 'featurization/requirements.txt'
 
     - name: Install dependencies
+      if: env.valid == 'true'
       run: |
         python -m pip install -r featurization/requirements.txt
 
     - name: Test that pysipfenn is available
+      if: env.valid == 'true'
       run: python -c "import pysipfenn; c = pysipfenn.Calculator()"
