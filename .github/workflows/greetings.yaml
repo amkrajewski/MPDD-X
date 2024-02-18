@@ -1,0 +1,22 @@
+name: User Greetings
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  respond:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Respond to issue
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const issue_number = context.payload.issue.number;
+            const username = context.payload.issue.user.login;
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue_number,
+              body: `Hello @${username}! Please comment below on this issue while attaching a ZIP file with atomic structures to get started! You can put keywords describing it in the body of the comment.`
+            });
