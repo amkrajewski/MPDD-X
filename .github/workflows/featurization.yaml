@@ -43,12 +43,12 @@ jobs:
     - name: Download file
       id: download
       env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        PAT: ${{ secrets.PAT }}
       run: |
         file=$(cat match.txt)
         file=$(echo $file | sed 's/\.zipLICENSE/\.zip/g')
         echo $file
-        wget --header="Authorization: token $GH_TOKEN" $file -O task.zip || echo "::set-output name=failed::true"
+        wget --header='Authorization: token ${{ secrets.PAT }}' --header='Accept: application/vnd.github.v3.raw' -O task.zip $file || echo "::set-output name=failed::true"
         
     - name: Send message if download failed
       uses: actions/github-script@v5
