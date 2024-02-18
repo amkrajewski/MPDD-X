@@ -10,32 +10,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install Miniforge
-      run: |
-        wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-MacOSX-arm64.sh
-        bash Miniforge3-MacOSX-arm64.sh -b -p $HOME/miniforge3
-        echo "$HOME/miniforge3/bin" >> $GITHUB_PATH
-
-    - name: Set up Conda
-      run: |
-        conda create --name featurization python=3.10
-        conda init bash
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        cache: 'pip'
+        cache-dependency-path: 'featurization/requirements.txt'
 
     - name: Install dependencies
       run: |
-        source $HOME/miniforge3/etc/profile.d/conda.sh
-        conda activate featurization
-        conda install -c conda-forge pysipfenn=0.13.1 numpy=1.25 pymatgen=2024.2.8 spglib=2.0.2 pymongo=4.6
-
-    - name: Check what was installed
-      run: conda list
-
-    - name: Cache Conda
-      id: cache-conda
-      uses: actions/cache@v3
-      with:
-        path: ~/miniforge3/envs/
-        key: ${{ runner.os }}-conda-featurization
+        python -m pip install -r featurization/requirements.txt
 
     - name: Test that pysipfenn is available
       run: python -c "import pysipfenn; c = pysipfenn.Calculator()"
