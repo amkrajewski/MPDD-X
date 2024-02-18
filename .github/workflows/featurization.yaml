@@ -126,6 +126,21 @@ jobs:
       run: |
         python -m pip install -r featurization/requirements.txt
 
+    - name: Python set
+      if: env.valid == 'true'
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const issue = context.issue;
+          const message = '👍 [2/3] I received your files, extracted them, and set up the calculation environment! Please wait for results.';
+
+          github.rest.issues.createComment({
+            owner: issue.owner,
+            repo: issue.repo,
+            issue_number: issue.number,
+            body: message
+          });
+
     - name: Run pySIPFENN with NN30
       if: env.valid == 'true'
       run: |
