@@ -1,0 +1,34 @@
+name: FeaturizationWorker
+
+on: 
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Set up Miniconda
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        auto-update-conda: true
+        python-version: 3.10
+
+    - name: Cache Conda
+      id: cache-conda
+      uses: actions/cache@v3
+      with:
+        path: ~/miniconda/envs/
+        key: ${{ runner.os }}-conda-${{ hashFiles('featurization/environment.yml') }}
+
+    - name: Create and activate Conda environment
+      run: |
+        if [[ "${{ steps.cache-conda.outputs.cache-hit }}" != 'true' ]]; then
+          conda env create --file featurization/environment.yml
+        fi
+        echo "conda activate Featurization" >> $GITHUB_ENV
+
+    - name: Test that pysipfenn is available
+      run: python -c "import pysipfenn; c = pysipfenn.Calculator()"
