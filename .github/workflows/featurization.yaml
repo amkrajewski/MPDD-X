@@ -44,6 +44,8 @@ jobs:
       id: download
       run: |
         cat match.txt
+        sed -i '' 's/\.zipLICENSE/\.zip/g' match.txt
+        cat match.txt
         curl -o task.zip $(cat match.txt) || echo "::set-output name=failed::true"
         ls
       shell: bash
