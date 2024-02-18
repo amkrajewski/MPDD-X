@@ -42,9 +42,9 @@ jobs:
       if: env.MATCH != 'false'
       id: download
       run: |
-        echo "URL: '${{ env.MATCH }}'"
-        if [ -n "${{ env.MATCH }}" ]; then
-          curl -O ${{ env.MATCH }} && echo "downloaded=true" >> $GITHUB_ENV || echo "downloaded=false" >> $GITHUB_ENV
+        echo "URL: $MATCH"
+        if [ -n "$MATCH" ]; then
+          curl -O $MATCH && echo "downloaded=true" >> $GITHUB_ENV || echo "downloaded=false" >> $GITHUB_ENV
         fi
         ls
         
