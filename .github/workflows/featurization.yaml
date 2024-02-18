@@ -62,11 +62,18 @@ jobs:
       run: |
         mkdir -p structures
         unzip "${{ steps.respond.outputs.result }}" -d structures
+        cd structures
+        ls
         
     - name: Verify file extensions
       id: verify
       run: |
         shopt -s nocasematch
+        if [ -z "$(ls -A structures)" ]; then
+           echo "No files found in structures directory"
+           echo "valid=false" >> $GITHUB_ENV
+           exit 1
+        fi
         for file in structures/*; do
           extension="${file##*.}"
           if [[ "$extension" != "poscar" && "$extension" != "cif" && "$extension" != "vasp" ]]; then
