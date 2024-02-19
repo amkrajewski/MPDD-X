@@ -1,5 +1,5 @@
 print('Importing pySIPFENN...', flush=True)
-from pysipfenn.core.pysipfenn import Calculator
+from pysipfenn import Calculator
 import numpy as np
 # ****************  pySIPFENN  **********************
 # Init
