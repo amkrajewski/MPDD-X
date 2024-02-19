@@ -1,5 +1,5 @@
 pysipfenn>=0.13.1
-mpdd-alignn>=1.0.1
+mpdd-alignn>=1.0.2
 numpy==1.26
 pymatgen==2024.2.8
 spglib==2.0.2
