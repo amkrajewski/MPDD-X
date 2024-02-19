@@ -71,9 +71,7 @@ jobs:
         unzip task.zip -d structures_in
         find ./structures_in -mindepth 2 -type f -exec mv -i {} ./structures \;
         find ./structures -type f -name ".*" -delete
-        cd structures
-        rm -rf __MACOSX
-        ls
+        ls -A structures
         
     - name: Verify file extensions
       if: steps.download.outputs.failed != 'true'
