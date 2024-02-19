@@ -2,7 +2,7 @@
 print('Importing MPDD-ALIGNN...', flush=True)
 from alignn import pretrained
 print('ALIGNN Running...', flush=True)
-pretrained.download_default_models(verbose=True)
+pretrained.download_default_models(verbose=True, parallel=False)
 print('ALIGNN Models Downloaded!', flush=True)
 alignnResult = pretrained.run_models_from_directory('structures', mode='serial')
 print('ALIGNN Done!', flush=True)
