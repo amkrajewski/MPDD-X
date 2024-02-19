@@ -67,8 +67,10 @@ jobs:
       if: steps.download.outputs.failed != 'true'
       run: |
         mkdir -p structures
-        ls
-        unzip task.zip -d structures
+        mkdir -p structures_in
+        unzip task.zip -d structures_in
+        find ./structures_in -mindepth 2 -type f -exec mv -i {} ./structures \;
+        find ./structures -type f -name ".*" -delete
         cd structures
         rm -rf __MACOSX
         ls
