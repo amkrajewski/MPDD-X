@@ -146,7 +146,7 @@ jobs:
     - name: Run pySIPFENN with NN30
       if: env.valid == 'true'
       run: |
-        python featurization/pysipfenn.py
+        python featurization/pysipfenn-minimal.py
 
     - name: Run another step if Python step fails
       if: failure()
