@@ -1,10 +1,10 @@
 print('Importing pySIPFENN...', flush=True)
-import pysipfenn
+from pysipfenn.core.pysipfenn import Calculator
 import numpy as np
 # ****************  pySIPFENN  **********************
 # Init
 print('\n\n\nStarting pySIPFENN Run', flush=True)
-c = pysipfenn.Calculator()
+c = Calculator()
 # Get model and run from directory
 c.downloadModels('SIPFENN_Krajewski2022_NN30')
 c.loadModels('SIPFENN_Krajewski2022_NN30')
