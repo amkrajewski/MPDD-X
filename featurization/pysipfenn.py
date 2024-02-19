@@ -18,26 +18,9 @@ c.writeResultsToCSV('results.csv')
 del c
 print('pySIPFENN Done!\n\n\n', flush=True)
 
-# *****************   ALIGNN    **********************
-print('Importing MPDD-ALIGNN...', flush=True)
-from alignn import pretrained
-print('ALIGNN Running...', flush=True)
-pretrained.download_default_models()
-print('ALIGNN Models Downloaded!', flush=True)
-alignnResult = pretrained.run_models_from_directory('structures', mode='serial')
-print('ALIGNN Done!', flush=True)
-
-# *********   Merge and write to file    **************
-# Match results based on the `name` field
-finalResult = []
-for sr in sipfennResult:
-    for ar in alignnResult:
-        if sr['name'] == ar['name']:
-            finalResult.append({**sr, **ar})
-            break
 
 # Order keys in order "name", "SIPFENN_*", "ALIGNN_*"
-finalResult = [{**{'name': e['name']}, **{k: e[k] for k in e if k.startswith('SIPFENN')} , **{k: e[k] for k in e if k.startswith('ALIGNN')}} for e in finalResult]
+finalResult = [{**{'name': e['name']}, **{k: e[k] for k in e if k.startswith('SIPFENN')}} for e in sipfennResult]
 print(finalResult, flush=True)
 outString = f'| {" | ".join(finalResult[0].keys())} |\n'
 outString += f'| {" | ".join(["---" for _ in finalResult[0].keys()])} |\n'
