@@ -166,7 +166,7 @@ jobs:
     - name: Run MPDD-ALIGNN with 7 default models
       if: env.valid == 'true'
       run: |
-        python featurization/alignn.py
+        python featurization/alignn-minimal.py
     
     - name: Run another step if Python step fails
       if: failure()
