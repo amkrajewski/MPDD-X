@@ -133,7 +133,7 @@ jobs:
       with:
         script: |
           const issue = context.issue;
-          const message = '👍 [2/3] I received your files, extracted them, and set up the calculation environment! Please wait for results.';
+          const message = '👍 [2/3] I received your files, extracted them, and set up the calculation environment! Please make a coffee and wait for results. This should take a couple of minutes to return.';
 
           github.rest.issues.createComment({
             owner: issue.owner,
@@ -142,10 +142,10 @@ jobs:
             body: message
           });
 
-    - name: Run pySIPFENN with NN30 and MPDD-ALIGNN with 7 default models
+    - name: Run pySIPFENN with NN30
       if: env.valid == 'true'
       run: |
-        python featurization/minimal.py
+        python featurization/pysipfenn.py
 
     - name: Run another step if Python step fails
       if: failure()
@@ -153,7 +153,27 @@ jobs:
       with:
         script: |
           const issue = context.issue;
-          const message = '😢 Something went wrong at the calculation step...';
+          const message = '😢 Something went wrong at the pySIPFENN calculation step...';
+
+          github.rest.issues.createComment({
+            owner: issue.owner,
+            repo: issue.repo,
+            issue_number: issue.number,
+            body: message
+          });
+
+    - name: Run MPDD-ALIGNN with 7 default models
+      if: env.valid == 'true'
+      run: |
+        python featurization/alignn.py
+    
+    - name: Run another step if Python step fails
+      if: failure()
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const issue = context.issue;
+          const message = '😢 Something went wrong at the ALIGNN calculation step...';
 
           github.rest.issues.createComment({
             owner: issue.owner,
@@ -190,8 +210,10 @@ jobs:
         script: |
           const fs = require('fs');
           const issue = context.issue;
-          const fileContent = fs.readFileSync('response.md', 'utf8');
-          let message = `🚀 [3/3] All Done! Obtained results are in the table below: \n\n${fileContent}`;
+          const fileContent1 = fs.readFileSync('response_pySIPFENN.md', 'utf8');
+          const fileContent2 = fs.readFileSync('response_ALIGNN.md', 'utf8');
+          let message = `🚀 [3/3] All Done! Obtained results are in the table below: \n\n**pySIPFENN:**\n${fileContent1}`;
+          message += `\n\n**ALIGNN**\n${fileContent2}`;
 
           const artifactUrl = `https://github.com/${issue.owner}/${issue.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
 

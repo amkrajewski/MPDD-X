@@ -16,7 +16,7 @@ for e in finalResult:
     outString += f'| {e["name"]} '
     outString += f'| {" | ".join([str(round(v,4)) for k, v in e.items() if k != "name"])} |\n'
 print(outString)
-with open('response.md', 'w') as f:
+with open('response_ALIGNN.md', 'w') as f:
     f.write(outString)
 
 print('\n\n\nAll Done!')
