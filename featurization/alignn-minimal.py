@@ -8,7 +8,7 @@ alignnResult = pretrained.run_models_from_directory('structures', mode='serial')
 print('ALIGNN Done!', flush=True)
 
 # Order keys in order "name", "SIPFENN_*", "ALIGNN_*"
-finalResult = [{**{'name': e['name']}, **{k: e[k] for k in e if k.startswith('ALIGNN')}} for e in finalResult]
+finalResult = [{**{'name': e['name']}, **{k: e[k] for k in e if k.startswith('ALIGNN')}} for e in alignnResult]
 print(finalResult, flush=True)
 outString = f'| {" | ".join(finalResult[0].keys())} |\n'
 outString += f'| {" | ".join(["---" for _ in finalResult[0].keys()])} |\n'
