@@ -1,6 +1,7 @@
 print('Importing pySIPFENN...', flush=True)
 from pysipfenn import Calculator
 import numpy as np
+from natsort import natsorted
 # ****************  pySIPFENN  **********************
 # Init
 print('\n\n\nStarting pySIPFENN Run', flush=True)
@@ -21,6 +22,7 @@ print('pySIPFENN Done!\n\n\n', flush=True)
 
 # Order keys in order "name", "SIPFENN_*", "ALIGNN_*"
 finalResult = [{**{'name': e['name']}, **{k: e[k] for k in e if k.startswith('SIPFENN')}} for e in sipfennResult]
+finalResult = natsorted(finalResult, key=lambda e: e['name'])
 print(finalResult, flush=True)
 outString = f'| {" | ".join(finalResult[0].keys())} |\n'
 outString += f'| {" | ".join(["---" for _ in finalResult[0].keys()])} |\n'
