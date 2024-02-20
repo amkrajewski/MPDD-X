@@ -37,7 +37,7 @@ print([round(e, 4) for e in energies], flush=True)
 print('Relaxing structures...', flush=True)
 # Relax structures
 t1 = time.time()
-relaxer = StructOptimizer(use_device='mps')
+relaxer = StructOptimizer()
 relaxed_structures = []
 for s in tqdm(structures):
     result = relaxer.relax(
