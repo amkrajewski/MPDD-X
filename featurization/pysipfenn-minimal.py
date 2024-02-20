@@ -19,10 +19,14 @@ c.writeResultsToCSV('results.csv')
 del c
 print('pySIPFENN Done!\n\n\n', flush=True)
 
-
-# Order keys in order "name", "SIPFENN_*", "ALIGNN_*"
-finalResult = [{**{'name': e['name']}, **{k: e[k] for k in e if k.startswith('SIPFENN')}} for e in sipfennResult]
+# Rename key 'SIPFENN_Krajewski2022_NN30' to 'SIPFENN_NN30-OQMD [eV/atom]' and then order keys
+finalResult = []
+for e in sipfennResult:
+    finalResult.append({
+        'name': e['name'], 
+        'SIPFENN_NN30-OQMD [eV/atom]': e['SIPFENN_Krajewski2022_NN30']})
 finalResult = natsorted(finalResult, key=lambda e: e['name'])
+
 print(finalResult, flush=True)
 outString = f'| {" | ".join(finalResult[0].keys())} |\n'
 outString += f'| {" | ".join(["---" for _ in finalResult[0].keys()])} |\n'
