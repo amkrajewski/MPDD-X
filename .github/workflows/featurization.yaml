@@ -164,26 +164,6 @@ jobs:
             body: message
           });
 
-    - name: Run CHGNet v0.3.0 and their relaxation
-      if: env.valid == 'true'
-      run: |
-        python featurization/chgnet-minimal.py
-
-    - name: Run another step if Python step fails
-      if: failure()
-      uses: actions/github-script@v5
-      with:
-        script: |
-          const issue = context.issue;
-          const message = '😢 Something went wrong at the CHGNet calculation step...';
-
-          github.rest.issues.createComment({
-            owner: issue.owner,
-            repo: issue.repo,
-            issue_number: issue.number,
-            body: message
-          });
-
     - name: Run MPDD-ALIGNN with 7 default models
       if: env.valid == 'true'
       run: |
@@ -204,26 +184,54 @@ jobs:
             body: message
           });
 
+    - name: Run CHGNet v0.3.0 and their relaxation
+      if: env.valid == 'true'
+      run: |
+        python featurization/chgnet-minimal.py
+        zip -r -9 structures_relaxed.zip structures_relaxed
+
+    - name: Run another step if Python step fails
+      if: failure()
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const issue = context.issue;
+          const message = '😢 Something went wrong at the CHGNet calculation step...';
+
+          github.rest.issues.createComment({
+            owner: issue.owner,
+            repo: issue.repo,
+            issue_number: issue.number,
+            body: message
+          });
+
     - name: Upload file as artifact
       if: env.valid == 'true'
       uses: actions/upload-artifact@v2
       with:
-        name: descriptor-data-npy
+        name: pySIPFENN-descriptorData.npy
         path: descriptorData.npy
 
     - name: Upload file as artifact
       if: env.valid == 'true'
       uses: actions/upload-artifact@v2
       with:
-        name: descriptor-data-npy
+        name: pySIPFENN-descriptorData.csv
         path: descriptorData.csv
 
     - name: Upload file as artifact
       if: env.valid == 'true'
       uses: actions/upload-artifact@v2
       with:
-        name: results-csv
+        name: pySIPFENN-results.csv
         path: results.csv
+
+    - name: Upload file as artifact
+      if: env.valid == 'true'
+      uses: actions/upload-artifact@v2
+      with:
+        name: CHGNet-structures_relaxed.zip
+        path: structures_relaxed.zip
 
     - name: Report results
       if: env.valid == 'true'
@@ -234,12 +242,14 @@ jobs:
           const issue = context.issue;
           const fileContent1 = fs.readFileSync('response_pySIPFENN.md', 'utf8');
           const fileContent2 = fs.readFileSync('response_ALIGNN.md', 'utf8');
+          const fileContent3 = fs.readFileSync('response_CHGNet.md', 'utf8');
           let message = `🚀 [3/3] All Done! Obtained results are in the table below: \n\n**pySIPFENN:**\n${fileContent1}`;
-          message += `\n\n**ALIGNN**\n${fileContent2}`;
+          message += `\n\n**ALIGNN:**\n${fileContent2}`;
+          message += `\n\n**CHGNet:**\n${fileContent3}`;
 
           const artifactUrl = `https://github.com/${issue.owner}/${issue.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
 
-          message += `\nFor a few days, you can also download the raw descriptor data Numpy array and results CSV [under Artifact tab here](${artifactUrl})`;
+          message += `\n**For the next 30 days, you can also download other results like pySIPFENN's raw descriptor data Numpy array and CHGNet-relaxed structure files** [**under Artifact tab here**](${artifactUrl})`;
           message += `\nEnjoy!`
     
           github.rest.issues.createComment({

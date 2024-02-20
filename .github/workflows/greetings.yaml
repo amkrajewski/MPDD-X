@@ -18,5 +18,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issue_number,
-              body: `Hello @${username}! Please comment below on this issue while attaching a ZIP file with atomic structures to get started! You can put keywords describing it in the body of the comment.`
+              body: `Hello @${username}! Please comment below on this issue while attaching a ZIP file with atomic structures (POSCAR/CIFs) to get started! You can put keywords describing it in the body of the comment.`
             });
