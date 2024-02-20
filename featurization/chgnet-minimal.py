@@ -12,6 +12,7 @@ import os
 structures, names = [], []
 files = os.listdir('structures')
 files = natsort.natsorted(files)
+print(files)
 for file in files:
     structures.append(Structure.from_file(f'structures/{file}'))
     names.append(file)
@@ -54,7 +55,7 @@ for s in tqdm(structures):
     relaxed_structures.append(result['final_structure'])
 print(f'Relaxation done at {(time.time()-t1)/len(structures):.2f} s/structure', flush=True)
 for struct, name in zip(relaxed_structures, names):
-    struct.to(f'relaxed_structures/{name}')
+    struct.to(f'structures_relaxed/{name}')
 
 print('Running energy predictions on relaxed structures...', flush=True)
 # Run energy predictions on relaxed structures
@@ -72,7 +73,8 @@ print(f'Energies obtained at {(time.time()-t2)/len(structures):.2f} s/structure'
 print([round(e, 4) for e in relaxed_energies], flush=True)
 
 # Markdown output
-outString = f'| Name | CHGNet_0.3.0-MP Formation Energy [eV/atom] | CHGNet_0.3.0-MP Relaxed Formation Energy [eV/atom] |\n'
+outString = '\nPlease note that these are *energies*, not *formation energies*.\n'
+outString += f'| Name | CHGNet_0.3.0-MP Energy [eV/atom] | CHGNet_0.3.0-MP Relaxed Energy [eV/atom] |\n'
 outString += f'| --- | --- | --- |\n'
 for n, e, re in zip(names, energies, relaxed_energies):
     outString += f'| {n} | {round(e, 4)} | {round(re, 4)} |\n'

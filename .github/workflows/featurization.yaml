@@ -66,8 +66,9 @@ jobs:
     - name: Unzip file
       if: steps.download.outputs.failed != 'true'
       run: |
-        mkdir -p structures
         mkdir -p structures_in
+        mkdir -p structures
+        mkdir -p structures_relaxed
         unzip task.zip -d structures_in
         find ./structures_in -type f -exec mv -i {} ./structures \;
         find ./structures -type f -name ".*" -delete
@@ -155,6 +156,26 @@ jobs:
         script: |
           const issue = context.issue;
           const message = '😢 Something went wrong at the pySIPFENN calculation step...';
+
+          github.rest.issues.createComment({
+            owner: issue.owner,
+            repo: issue.repo,
+            issue_number: issue.number,
+            body: message
+          });
+
+    - name: Run CHGNet v0.3.0 and their relaxation
+      if: env.valid == 'true'
+      run: |
+        python featurization/chgnet-minimal.py
+
+    - name: Run another step if Python step fails
+      if: failure()
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const issue = context.issue;
+          const message = '😢 Something went wrong at the CHGNet calculation step...';
 
           github.rest.issues.createComment({
             owner: issue.owner,
