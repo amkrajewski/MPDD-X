@@ -49,8 +49,7 @@ for s in tqdm(structures):
         save_path = None,
         loginterval = 1,
         crystal_feas_save_path = None,
-        verbose=False,
-        assign_magmoms=False
+        verbose=True
         )
     relaxed_structures.append(result['final_structure'])
 print(f'Relaxation done at {(time.time()-t1)/len(structures):.2f} s/structure', flush=True)
