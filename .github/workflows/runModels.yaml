@@ -256,6 +256,8 @@ jobs:
       if: env.valid == 'true'
       run: |
         issue_number=${{ github.event.issue.number }}
+        random_string=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c20 ; echo '')
+        issue_number="${issue_number}_${random_string}"
         tar -c structures structures_relaxed response_pySIPFENN.md response_ALIGNN.md response_CHGNet.md descriptorData.npy results.csv  | zstd -15 -o "contributions/contrib_${issue_number}.tar.zst"
     
     - name: Commit changes with Add & Commit
@@ -265,6 +267,13 @@ jobs:
         message: '(automatic) Contribution Persisted'
         add: "contributions/*.tar.zst"
 
+    - name: Get commit hash
+      id: gethash
+      run: echo "::set-output name=hash::$(git rev-parse HEAD)"
+    
+    - name: Print commit hash
+      run: echo "The commit hash is ${{ steps.gethash.outputs.hash }}"
+
     - name: Report results
       if: env.valid == 'true'
       uses: actions/github-script@v5
@@ -272,7 +281,7 @@ jobs:
         script: |
           const fs = require('fs');
           const issue = context.issue;
-          const full_commit_hash = "${{ steps.commit.outputs.commit }}";
+          const full_commit_hash = "${{ steps.gethash.outputs.hash }}";
           const commit_hash = full_commit_hash.substring(0, 8);
           const fileContent1 = fs.readFileSync('response_pySIPFENN.md', 'utf8');
           const fileContent2 = fs.readFileSync('response_ALIGNN.md', 'utf8');
