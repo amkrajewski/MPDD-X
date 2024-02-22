@@ -18,5 +18,10 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issue_number,
-              body: `Hello @${username}! Please comment below on this issue while attaching a ZIP file with atomic structures (POSCAR/CIFs) to get started! You can put keywords describing it in the body of the comment.`
+              body: `Hello @${username}! Please comment below on this issue while attaching a ZIP file with atomic structures (\`POSCAR\`/\`CIF\`s) to get started! You can put keywords describing it in the body of the comment.
+      
+              As soon as you do it, your atomic structures will be processed through several tools, described below, and return a neat Markdown report.
+              - [\`pySIPFENN\`](https://github.com/PhasesResearchLab/pySIPFENN) framework, returning (1) array of descriptors (feature vectors) in Numpy \`.npy\` and \`CSV\` formats you can use for your ML modelling, alongside formation energy predictions.
+              - [\`ALIGNN\`](https://github.com/usnistgov/alignn) framework, returning (1) results from 7 \`ALIGNN\` models [specified here](https://github.com/amkrajewski/mpdd-alignn/blob/main/alignn/config.yaml) and (2) compressed graph representation files.
+              - [\`CHGNet\`](https://github.com/CederGroupHub/chgnet) model, returning (1) energy prediction for your input, (2) \`CHGNet\`-relaxed structures in the same format (\`POSCAR\`/\`CIF\`) as your input, and (3) energy prediction for the relaxed structures.`
             });
