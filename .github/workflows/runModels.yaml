@@ -11,6 +11,24 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Verify issue is not ENH, BUG, or FIX
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const issueNumber = context.issue.number;
+          const issue = await github.rest.issues.get({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: issueNumber,
+          });
+          const title = issue.data.title;
+          if (title.includes('[ENH]') || title.includes('[BUG]') || title.includes('[FIX]')) {
+            console.log('Issue title contains [ENH], [BUG], or [FIX], cancelling workflow');
+            const { owner, repo } = context.repo;
+            const runId = context.runId;
+            await github.rest.actions.cancelWorkflowRun({ owner, repo, run_id: runId });
+          }
+
     - name: Respond to comment
       uses: actions/github-script@v5
       id: respond
@@ -26,7 +44,7 @@ jobs:
     
           let message;
           if (matches && matches.length > 0) {
-            message = '👍 [1/3] I found a ZIP file linked in your comment. I will now attempt to download it and validate contents.';
+            message = '👍 [1/3] I found the ZIP file linked in your comment. I will now attempt to download it and validate contents!';
             fs.writeFileSync('match.txt', matches[0]);
           } else {
             message = '😢 Your comment does not contain any direct links to ZIP files. Please note that certain cloud providers do not support that. Try to directly drag-and-drop into a comment.';
@@ -54,7 +72,7 @@ jobs:
       with:
         script: |
           const issue = context.issue;
-          const message = '😢 Could not download the task files. Exiting now...';
+          const message = '😢 I could not download the task ZIP file. Exiting now...';
 
           github.rest.issues.createComment({
             owner: issue.owner,
@@ -105,7 +123,7 @@ jobs:
       with:
         script: |
           const issue = context.issue;
-          const message = '😢 The files supplied in ZIP do not have one of the required extensions: `poscar`, `cif`, or `vasp`.';
+          const message = '😢 The files supplied in ZIP do not have one of the required extensions: `CIF` or `POSCAR` (or `VASP`). If you need another format to work, let us know!';
 
           github.rest.issues.createComment({
             owner: issue.owner,
@@ -128,7 +146,7 @@ jobs:
       with:
         script: |
           const issue = context.issue;
-          const message = '👍 [2/3] I received your files and extracted them! Now, I will set up the calculation environment and run: `pySIPFENN`, `CHGNet`, and `ALIGNN`. You can now have A coffee and wait for results. This should take a couple of minutes to return.';
+          const message = '👍 [2/3] I received your files and extracted them! Now, I will set up the calculation environment and run: `pySIPFENN`, `CHGNet`, and `ALIGNN`. \nYou can now have A coffee and wait for results. Obtaining results should take at least a couple of minutes.';
 
           github.rest.issues.createComment({
             owner: issue.owner,
@@ -156,7 +174,7 @@ jobs:
       with:
         script: |
           const issue = context.issue;
-          const message = '😢 Something went wrong at the pySIPFENN calculation step...';
+          const message = '😢 Something went wrong at the pySIPFENN calculation step...\nYou can see logs under Actions tab.';
 
           github.rest.issues.createComment({
             owner: issue.owner,
@@ -176,7 +194,7 @@ jobs:
       with:
         script: |
           const issue = context.issue;
-          const message = '😢 Something went wrong at the ALIGNN calculation step...';
+          const message = '😢 Something went wrong at the ALIGNN calculation step...\nYou can see logs under Actions tab.';
 
           github.rest.issues.createComment({
             owner: issue.owner,
@@ -197,7 +215,7 @@ jobs:
       with:
         script: |
           const issue = context.issue;
-          const message = '😢 Something went wrong at the CHGNet calculation step...';
+          const message = '😢 Something went wrong at the CHGNet calculation step...\nYou can see logs under Actions tab.';
 
           github.rest.issues.createComment({
             owner: issue.owner,
