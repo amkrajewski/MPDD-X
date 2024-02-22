@@ -252,6 +252,19 @@ jobs:
         name: CHGNet-structures_relaxed.zip
         path: structures_relaxed.zip
 
+    - name: Tar and compress all files
+      if: env.valid == 'true'
+      run: |
+        issue_number=${{ github.event.issue.number }}
+        tar -c structures structures_relaxed response_pySIPFENN.md response_ALIGNN.md response_CHGNet.md descriptorData.npy pySIPFENN-results.csv  | zstd -o "contributions/contrib_${issue_number}.tar.zst"
+
+    - name: Commit changes with Add & Commit
+      id: commit
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: '(automatic) Contribution Persisted'
+        add: "contributions/contrib_${issue_number}.tar.zst"
+
     - name: Report results
       if: env.valid == 'true'
       uses: actions/github-script@v5
@@ -259,10 +272,13 @@ jobs:
         script: |
           const fs = require('fs');
           const issue = context.issue;
+          const full_commit_hash = "${{ steps.commit.outputs.commit }}";
+          const commit_hash = full_commit_hash.substring(0, 8);
           const fileContent1 = fs.readFileSync('response_pySIPFENN.md', 'utf8');
           const fileContent2 = fs.readFileSync('response_ALIGNN.md', 'utf8');
           const fileContent3 = fs.readFileSync('response_CHGNet.md', 'utf8');
-          let message = `🚀 [3/3] All Done! Obtained results are in the table below: \n\n**pySIPFENN:**\n${fileContent1}`;
+          
+          let message = `🚀 [3/3] All Done!\n Your submission and all results been persisted under [contrib.mpdd.org/${commit_hash}](https://contrib.mpdd.org/${commit_hash}). For results, please see the table below: \n\n**pySIPFENN:**\n${fileContent1}`;
           message += `\n\n**ALIGNN:**\n${fileContent2}`;
           message += `\n\n**CHGNet:**\n${fileContent3}`;
 
