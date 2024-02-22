@@ -7,6 +7,24 @@ jobs:
   respond:
     runs-on: ubuntu-latest
     steps:
+      - name: Verify issue is not ENH, BUG, or FIX
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const issueNumber = context.issue.number;
+            const issue = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+            });
+            const title = issue.data.title;
+            if (title.includes('[ENH]') || title.includes('[BUG]') || title.includes('[FIX]')) {
+              console.log('Issue title contains [ENH], [BUG], or [FIX], cancelling workflow');
+              const { owner, repo } = context.repo;
+              const runId = context.runId;
+              await github.rest.actions.cancelWorkflowRun({ owner, repo, run_id: runId });
+            }
+            
       - name: Respond to issue
         uses: actions/github-script@v5
         with:
