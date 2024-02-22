@@ -2,7 +2,7 @@
 name: Contribution Template
 about: Placed here just to say no content is needed to get started!
 title: "[IN]"
-labels: ''
+labels: contrib
 assignees: ''
 
 ---
