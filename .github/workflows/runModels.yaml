@@ -257,14 +257,13 @@ jobs:
       run: |
         issue_number=${{ github.event.issue.number }}
         tar -c structures structures_relaxed response_pySIPFENN.md response_ALIGNN.md response_CHGNet.md descriptorData.npy results.csv  | zstd -15 -o "contributions/contrib_${issue_number}.tar.zst"
-
+    
     - name: Commit changes with Add & Commit
       id: commit
       uses: EndBug/add-and-commit@v9
       with:
         message: '(automatic) Contribution Persisted'
         add: "contributions/*.tar.zst"
-        pull: '--rebase'
 
     - name: Report results
       if: env.valid == 'true'
