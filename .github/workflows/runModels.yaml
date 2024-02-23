@@ -226,39 +226,39 @@ jobs:
 
     - name: Upload file as artifact
       if: env.valid == 'true'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: pySIPFENN-descriptorData.npy
         path: descriptorData.npy
 
     - name: Upload file as artifact
       if: env.valid == 'true'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: pySIPFENN-descriptorData.csv
         path: descriptorData.csv
 
     - name: Upload file as artifact
       if: env.valid == 'true'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: pySIPFENN-results.csv
         path: results.csv
 
     - name: Upload file as artifact
       if: env.valid == 'true'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: CHGNet-structures_relaxed.zip
         path: structures_relaxed.zip
 
-    - name: Tar and compress all files
+    - name: ZIP all files
       if: env.valid == 'true'
       run: |
         issue_number=${{ github.event.issue.number }}
         random_string=$(cat /dev/urandom | base64 | tr -dc '0-9a-zA-Z' | head -c20)
         issue_number="${issue_number}_${random_string}"
-        zip -9 "contributions/contrib_${issue_number}.zip" structures structures_relaxed response_pySIPFENN.md response_ALIGNN.md response_CHGNet.md descriptorData.npy results.csv log.txt
+        zip -6 "contributions/contrib_${issue_number}.zip" structures structures_relaxed response_pySIPFENN.md response_ALIGNN.md response_CHGNet.md descriptorData.npy results.csv log.txt
     
     - name: Commit changes with Add & Commit
       id: commit
