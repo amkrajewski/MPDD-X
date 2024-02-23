@@ -1,4 +1,4 @@
-# MPDD-contribute (experimental!)
+# MPDD-eXchange (experimental!)
 
 ***This repository is a one stop solution for getting material properties with ML models while contributing to a community database.***
 
