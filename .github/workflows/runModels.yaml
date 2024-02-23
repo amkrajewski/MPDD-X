@@ -314,7 +314,7 @@ jobs:
 
           const artifactUrl = `https://github.com/${issue.owner}/${issue.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
 
-          message += `\n**For the next 30 days, you can also download other results like pySIPFENN's raw descriptor data Numpy array and CHGNet-relaxed structure files** [**under Artifact tab here**](${artifactUrl})`;
+          message += `\n**For the next 30 days, you can also download other results like pySIPFENN's raw descriptor data Numpy array and CHGNet-relaxed structure files**\n [**under Artifact tab here**](${artifactUrl})`;
           message += `\nEnjoy!`
     
           github.rest.issues.createComment({
@@ -322,4 +322,19 @@ jobs:
             repo: issue.repo,
             issue_number: issue.number,
             body: message
+          });
+
+    - name: Comment on commit
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const fs = require('fs');
+          const { owner, repo } = context.repo;
+          const comment = fs.readFileSync('structureList.md', 'utf8');
+          const full_commit_hash = "${{ steps.gethash.outputs.hash }}";
+          await github.rest.repos.createCommitComment({
+            owner,
+            repo,
+            commit_sha: full_commit_hash,
+            body: comment,
           });
