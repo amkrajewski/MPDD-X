@@ -256,16 +256,16 @@ jobs:
       if: env.valid == 'true'
       run: |
         issue_number=${{ github.event.issue.number }}
-        random_string=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c20 ; echo '')
+        random_string=$(cat /dev/urandom | base64 | tr -dc '0-9a-zA-Z' | head -c20)
         issue_number="${issue_number}_${random_string}"
-        tar -c structures structures_relaxed response_pySIPFENN.md response_ALIGNN.md response_CHGNet.md descriptorData.npy results.csv  | zstd -15 -o "contributions/contrib_${issue_number}.tar.zst"
+        zip -9 "contributions/contrib_${issue_number}.zip" structures structures_relaxed response_pySIPFENN.md response_ALIGNN.md response_CHGNet.md descriptorData.npy results.csv
     
     - name: Commit changes with Add & Commit
       id: commit
       uses: EndBug/add-and-commit@v9
       with:
         message: '(automatic) Contribution Persisted'
-        add: "contributions/*.tar.zst"
+        add: "contributions/*.zip"
 
     - name: Get commit hash
       id: gethash
