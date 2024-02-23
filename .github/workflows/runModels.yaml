@@ -272,13 +272,14 @@ jobs:
         name: CHGNet-structures_relaxed.zip
         path: structures_relaxed.zip
 
-    - name: ZIP all files
+    - name: ZIP all files with 7zip
       if: env.valid == 'true'
       run: |
+        brew install p7zip
         issue_number=${{ github.event.issue.number }}
         random_string=$(cat /dev/urandom | base64 | tr -dc '0-9a-zA-Z' | head -c20)
         issue_number="${issue_number}_${random_string}"
-        zip "contributions/contrib_${issue_number}.zip" structures structures_relaxed response_pySIPFENN.md response_ALIGNN.md response_CHGNet.md descriptorData.npy results.csv log.txt structureList.md
+        7z a -tzip -mx=9 "contributions/contrib_${issue_number}.zip" structures structures_relaxed response_pySIPFENN.md response_ALIGNN.md response_CHGNet.md descriptorData.npy results.csv log.txt structureList.md
     
     - name: Commit changes with Add & Commit
       id: commit
