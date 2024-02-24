@@ -88,7 +88,7 @@ jobs:
         mkdir -p structures
         mkdir -p structures_relaxed
         unzip task.zip -d structures_in
-        find ./structures_in -type f xec mv -i {} ./structures \;
+        find ./structures_in -type f -exec mv -i {} ./structures \;
         find ./structures -type f -name ".*" -delete
         ls -A structures | tee -a log.txt
         
