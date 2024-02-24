@@ -272,22 +272,22 @@ jobs:
         name: CHGNet-structures_relaxed.zip
         path: structures_relaxed.zip
 
-    - name: ZIP all files with 7zip
+    - name: TAR GZ all files with 7zip
       if: env.valid == 'true'
       run: |
-        echo "Packaging into ZIP file now..."
+        echo "Packaging into .tar.gz file now..."
         issue_number=${{ github.event.issue.number }}
         random_string=$(cat /dev/urandom | base64 | tr -dc '0-9a-zA-Z' | head -c20)
         issue_number="${issue_number}_${random_string}"
         echo "${issue_number}"
-        tar -c structures structures_relaxed response_pySIPFENN.md response_ALIGNN.md response_CHGNet.md descriptorData.npy results.csv log.txt structureList.md  | 7z a -si -tgzip -mx=9 "contributions/contrib_${issue_number}.zip"
+        tar -c structures structures_relaxed response_pySIPFENN.md response_ALIGNN.md response_CHGNet.md descriptorData.npy results.csv log.txt structureList.md  | 7z a -si -tgzip -mx=9 "contributions/contrib_${issue_number}.tar.gz"
     
     - name: Commit changes with Add & Commit
       id: commit
       uses: EndBug/add-and-commit@v9
       with:
         message: '(automatic) Contribution Persisted'
-        add: "contributions/*.zip"
+        add: "contributions/*.tar.gz"
 
     - name: Get commit hash
       id: gethash
