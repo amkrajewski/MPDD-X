@@ -90,7 +90,7 @@ jobs:
         unzip task.zip -d structures_in
         find ./structures_in -type f -exec mv -i {} ./structures \;
         find ./structures -type f -name ".*" -delete
-        ls -A structures | tee log.txt
+        ls -A structures | tee -e log.txt
         
     - name: Verify file extensions
       if: steps.download.outputs.failed != 'true'
@@ -158,15 +158,15 @@ jobs:
     - name: Install dependencies
       if: env.valid == 'true'
       run: |
-        python -m pip install torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu | tee log.txt
-        python -m pip install -r featurization/requirements.txt | tee log.txt
-        python -m pip install git+https://github.com/amkrajewski/chgnet | tee log.txt
-        python -m pip install git+https://gitlab.com/ase/ase#bdd046c27 | tee log.txt
+        python -m pip install torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu | tee -e log.txt
+        python -m pip install -r featurization/requirements.txt | tee -e log.txt
+        python -m pip install git+https://github.com/amkrajewski/chgnet | tee -e log.txt
+        python -m pip install git+https://gitlab.com/ase/ase#bdd046c27 | tee -e log.txt
 
     - name: Check structures
       if: env.valid == 'true'
       run: |
-        python utils/structcheck.py | tee log.txt
+        python utils/structcheck.py | tee -e log.txt
 
     - name: Run another step if Python step fails
       if: failure()
@@ -186,7 +186,7 @@ jobs:
     - name: Run pySIPFENN with NN30
       if: env.valid == 'true'
       run: |
-        python featurization/pysipfenn-minimal.py | tee log.txt
+        python featurization/pysipfenn-minimal.py | tee -e log.txt
 
     - name: Run another step if Python step fails
       if: failure()
@@ -206,7 +206,7 @@ jobs:
     - name: Run MPDD-ALIGNN with 7 default models
       if: env.valid == 'true'
       run: |
-        python featurization/alignn-minimal.py | tee log.txt
+        python featurization/alignn-minimal.py | tee -e log.txt
     
     - name: Run another step if Python step fails
       if: failure()
@@ -226,8 +226,8 @@ jobs:
     - name: Run CHGNet v0.3.0 and their relaxation
       if: env.valid == 'true'
       run: |
-        python featurization/chgnet-minimal.py | tee log.txt
-        zip -r -9 structures_relaxed.zip structures_relaxed | tee log.txt
+        python featurization/chgnet-minimal.py | tee -e log.txt
+        zip -r -9 structures_relaxed.zip structures_relaxed | tee -e log.txt
 
     - name: Run another step if Python step fails
       if: failure()
@@ -278,6 +278,13 @@ jobs:
       with:
         name: parsedStructures.md
         path: structureList.md
+
+    - name: Upload file as artifact
+      if: env.valid == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: log.txt
+        path: log.txt
 
     - name: TAR GZ all files with 7zip
       if: env.valid == 'true'
