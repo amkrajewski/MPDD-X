@@ -277,7 +277,7 @@ jobs:
       run: |
         echo "Packaging into .tar.gz file now..."
         issue_number=${{ github.event.issue.number }}
-        random_string=$(cat /dev/urandom | base64 | tr -dc '0-9a-zA-Z' | head -c20)
+        random_string=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 20)
         issue_number="${issue_number}_${random_string}"
         echo "${issue_number}"
         tar -c structures structures_relaxed response_pySIPFENN.md response_ALIGNN.md response_CHGNet.md descriptorData.npy results.csv log.txt structureList.md  | 7z a -si -tgzip -mx=9 "contributions/contrib_${issue_number}.tar.gz"
