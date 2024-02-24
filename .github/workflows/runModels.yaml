@@ -291,7 +291,7 @@ jobs:
       run: |
         echo "Packaging into .tar.gz file now..."
         issue_number=${{ github.event.issue.number }}
-        date_string=$(date "+%d%b%y_%H:%M")
+        date_string=$(date "+%d%b%y_%H%M")
         echo $date_string
         issue_number="${issue_number}_${date_string}"
         echo "${issue_number}"
