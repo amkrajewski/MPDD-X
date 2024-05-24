@@ -1,5 +1,5 @@
 ---
-name: Contribution Template
+name: Data Contribution from Structure Files
 about: Placed here just to say no content is needed to get started!
 title: "[IN]"
 labels: contrib

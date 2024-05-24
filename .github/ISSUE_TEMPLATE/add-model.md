@@ -1,6 +1,6 @@
 ---
-name: Add Model
-about: Template for requesting to add a new model.
+name: ML Model Addition to the MPDD Ecosystem
+about: Template for requesting to add a new model into the MPDD ecosystem.
 title: "[ENH]"
 labels: enhancement
 assignees: ''
