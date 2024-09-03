@@ -207,7 +207,8 @@ jobs:
       with:
         script: |
           const issue = context.issue;
-          const message = '😢 I tried to read provided structure files and perform symmetry analysis, but something went wrong...\nYou can see logs under Actions tab.';
+          const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+          const message = '😢 I tried to read provided structure files and perform symmetry analysis, but something went wrong...\nYou can see detailed logs for this run here: ${runUrl}`;
 
           github.rest.issues.createComment({
             owner: issue.owner,
@@ -215,6 +216,14 @@ jobs:
             issue_number: issue.number,
             body: message
           });
+
+          await github.rest.actions.cancelWorkflowRun({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            run_id: context.runId
+          });
+
+          core.setFailed('Workflow cancelled due to an failure in structure checking by utils/structcheck.py.');
 
     - name: Run pySIPFENN with NN30
       id: run_pysipfenn
