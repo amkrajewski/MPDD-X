@@ -147,7 +147,7 @@ jobs:
       with:
         script: |
           const issue = context.issue;
-          const message = '😢 The files supplied in ZIP do not have one of the required extensions: `cif`/`CIF`, `poscar`/`POSCAR`, or `vasp`/`VASP`). If you need another format to work, let us know!';
+          const message = '😢 The files supplied in ZIP do not have one of the required extensions: `cif`/`CIF`, `poscar`/`POSCAR`, or `vasp`/`VASP`). If you need another format to work, let us know! Exiting now...';
 
           github.rest.issues.createComment({
             owner: issue.owner,
@@ -155,6 +155,14 @@ jobs:
             issue_number: issue.number,
             body: message
           });
+
+          await github.rest.actions.cancelWorkflowRun({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            run_id: context.runId
+          });
+
+          core.setFailed('Workflow cancelled due to an incompatible file extension.');
 
     - name: Set up Python 3.11
       uses: actions/setup-python@v5
