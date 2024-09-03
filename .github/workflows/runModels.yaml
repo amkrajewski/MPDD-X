@@ -122,10 +122,14 @@ jobs:
       if: env.valid == 'true'
       run: |
         for file in structures/*; do
-          filename=$(basename "$file")
-          extension="${filename##*.}"
-          newname="${filename%.*}.${extension^^}"
-          mv "$file" "structures/$newname"
+          if [ -f "$file" ]; then
+            filename=$(basename "$file")
+            extension=$(echo "${filename##*.}" | tr '[:lower:]' '[:upper:]')
+            newname="${filename%.*}.${extension}"
+            if [ "$file" != "structures/$newname" ]; then
+              mv "$file" "structures/$newname" || { echo "Error renaming $file"; exit 1; }
+            fi
+          fi
         done
         echo "Files renamed to uppercase extensions"
         
