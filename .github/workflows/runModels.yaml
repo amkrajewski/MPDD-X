@@ -81,6 +81,14 @@ jobs:
             body: message
           });
 
+          await github.rest.actions.cancelWorkflowRun({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            run_id: context.runId
+          });
+
+          core.setFailed('Workflow cancelled due to download failure');
+
     - name: Unzip file
       if: steps.download.outputs.failed != 'true'
       run: |
