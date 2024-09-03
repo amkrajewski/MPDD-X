@@ -237,7 +237,8 @@ jobs:
       with:
         script: |
           const issue = context.issue;
-          const message = '😢 Something went wrong at the pySIPFENN calculation step...\nYou can see logs under Actions tab.';
+          const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+          const message = '😢 Something went wrong at the pySIPFENN calculation step...\nYou can see detailed logs for this run here: ${runUrl}`;
 
           github.rest.issues.createComment({
             owner: issue.owner,
@@ -258,7 +259,8 @@ jobs:
       with:
         script: |
           const issue = context.issue;
-          const message = '😢 Something went wrong at the ALIGNN calculation step...\nYou can see logs under Actions tab.';
+          const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+          const message = '😢 Something went wrong at the ALIGNN calculation step...\nYou can see detailed logs for this run here: ${runUrl}`;
 
           github.rest.issues.createComment({
             owner: issue.owner,
@@ -280,7 +282,8 @@ jobs:
       with:
         script: |
           const issue = context.issue;
-          const message = '😢 Something went wrong at the CHGNet calculation step...\nYou can see logs under Actions tab.';
+          const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+          const message = '😢 Something went wrong at the CHGNet calculation step...\nYou can see detailed logs for this run here: ${runUrl}`;
 
           github.rest.issues.createComment({
             owner: issue.owner,
