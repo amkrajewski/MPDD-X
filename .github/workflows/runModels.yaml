@@ -385,6 +385,7 @@ jobs:
       with:
         message: '(automatic) Contribution Persisted'
         add: "contributions/*.tar.gz"
+        pull: '--rebase --autostash'
 
     - name: Get commit hash
       id: gethash
