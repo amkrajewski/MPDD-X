@@ -1,9 +1,10 @@
+# ****************  pySIPFENN  **********************
+print('Importing pySIPFENN...', flush=True)
+import sys
+from pysipfenn import Calculator
+import numpy as np
+from natsort import natsorted
 try:
-    print('Importing pySIPFENN...', flush=True)
-    from pysipfenn import Calculator
-    import numpy as np
-    from natsort import natsorted
-    # ****************  pySIPFENN  **********************
     # Init
     print('\n\n\nStarting pySIPFENN Run', flush=True)
     c = Calculator()
