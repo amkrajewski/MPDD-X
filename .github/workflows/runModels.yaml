@@ -347,46 +347,37 @@ jobs:
     
     - name: Check calculation steps and cancel workflow if any failed
       if: always()
+      id: calculations_check
+      run: |
+        if [[ ${{ steps.run_pysipfenn.outcome }} == 'failure' || 
+              ${{ steps.run_alignn.outcome }} == 'failure' || 
+              ${{ steps.run_chgnet.outcome }} == 'failure' ]]; then
+          echo "One or more calculation steps failed. Cancelling workflow."
+          exit 1
+        fi
+          
+    - name: Report failure and cancel workflow
+      if: steps.calculations_check.outcome == 'failure'
       uses: actions/github-script@v7
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
-          const failedSteps = [];
+          const issue = context.issue;
+          const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+          const message = `⚠️ One or more required calculation steps failed. The workflow has been cancelled. Please check the logs for more details: ${runUrl}`;
           
-          // Fetch the current job's steps
-          const { data: jobRun } = await github.rest.actions.getJobForWorkflowRun({
+          await github.rest.issues.createComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            job_id: context.job,
-            run_id: context.runId
+            issue_number: issue.number,
+            body: message
           });
           
-          jobRun.steps.forEach(step => {
-            if (step.name.includes('Run pySIPFENN') && step.conclusion === 'failure') failedSteps.push('pySIPFENN');
-            if (step.name.includes('Run ALIGNN') && step.conclusion === 'failure') failedSteps.push('ALIGNN');
-            if (step.name.includes('Run CHGNet') && step.conclusion === 'failure') failedSteps.push('CHGNet');
+          await github.rest.actions.cancelWorkflowRun({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            run_id: context.runId
           });
-      
-          if (failedSteps.length > 0) {
-            const failedStepsStr = failedSteps.join(', ');
-            const issue = context.issue;
-            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-            const message = `⚠️ The following required calculation steps failed: ${failedStepsStr}. The workflow has been cancelled. Please check the logs for more details: ${runUrl}`;
-            
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issue.number,
-              body: message
-            });
-            
-            core.setFailed(`Workflow cancelled due to failures in: ${failedStepsStr}`);
-            await github.rest.actions.cancelWorkflowRun({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: context.runId
-            });
-          }
 
     - name: Commit changes with Add & Commit
       id: commit
