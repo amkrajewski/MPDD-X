@@ -345,6 +345,38 @@ jobs:
         echo "${issue_number}"
         tar -c structures structures_relaxed response_pySIPFENN.md response_ALIGNN.md response_CHGNet.md descriptorData.npy results.csv log.txt structureList.md  | 7z a -si -tgzip -mx=9 "contributions/contrib_${issue_number}.tar.gz"
     
+    - name: Check calculation steps and cancel workflow if any failed
+      if: always()
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const failedSteps = [];
+          if (steps.run_pysipfenn.outcome === 'failure') failedSteps.push('pySIPFENN');
+          if (steps.run_alignn.outcome === 'failure') failedSteps.push('ALIGNN');
+          if (steps.run_chgnet.outcome === 'failure') failedSteps.push('CHGNet');
+          
+          if (failedSteps.length > 0) {
+            const failedStepsStr = failedSteps.join(', ');
+            const issue = context.issue;
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const message = `⚠️ The following required calculation steps failed: ${failedStepsStr}. The workflow has been cancelled. Please check the logs for more details: ${runUrl}`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: message
+            });
+            
+            core.setFailed(`Workflow cancelled due to failures in: ${failedStepsStr}`);
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            });
+          }
+
     - name: Commit changes with Add & Commit
       id: commit
       uses: EndBug/add-and-commit@v9
