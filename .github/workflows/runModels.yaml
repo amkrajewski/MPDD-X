@@ -352,10 +352,21 @@ jobs:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
           const failedSteps = [];
-          if (steps.run_pysipfenn.outcome === 'failure') failedSteps.push('pySIPFENN');
-          if (steps.run_alignn.outcome === 'failure') failedSteps.push('ALIGNN');
-          if (steps.run_chgnet.outcome === 'failure') failedSteps.push('CHGNet');
           
+          // Fetch the current job's steps
+          const { data: jobRun } = await github.rest.actions.getJobForWorkflowRun({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            job_id: context.job,
+            run_id: context.runId
+          });
+          
+          jobRun.steps.forEach(step => {
+            if (step.name.includes('Run pySIPFENN') && step.conclusion === 'failure') failedSteps.push('pySIPFENN');
+            if (step.name.includes('Run ALIGNN') && step.conclusion === 'failure') failedSteps.push('ALIGNN');
+            if (step.name.includes('Run CHGNet') && step.conclusion === 'failure') failedSteps.push('CHGNet');
+          });
+      
           if (failedSteps.length > 0) {
             const failedStepsStr = failedSteps.join(', ');
             const issue = context.issue;
