@@ -180,12 +180,13 @@ jobs:
         python -m pip install git+https://gitlab.com/ase/ase#bdd046c27 | tee -a log.txt
 
     - name: Check structures
+      id: check_structures
       if: env.valid == 'true'
       run: |
         python utils/structcheck.py | tee -a log.txt
 
     - name: Run another step if Python step fails
-      if: failure()
+      if: steps.check_structures.outcome == 'failure'
       uses: actions/github-script@v7
       with:
         script: |
@@ -200,12 +201,13 @@ jobs:
           });
 
     - name: Run pySIPFENN with NN30
+      id: run_pysipfenn
       if: env.valid == 'true'
       run: |
         python featurization/pysipfenn-minimal.py | tee -a log.txt
 
     - name: Run another step if Python step fails
-      if: failure()
+      if: steps.run_pysipfenn.outcome == 'failure'
       uses: actions/github-script@v7
       with:
         script: |
@@ -220,12 +222,13 @@ jobs:
           });
 
     - name: Run MPDD-ALIGNN with 7 default models
+      id: run_alignn
       if: env.valid == 'true'
       run: |
         python featurization/alignn-minimal.py | tee -a log.txt
     
     - name: Run another step if Python step fails
-      if: failure()
+      if: steps.run_alignn.outcome == 'failure'
       uses: actions/github-script@v7
       with:
         script: |
@@ -240,13 +243,14 @@ jobs:
           });
 
     - name: Run CHGNet v0.3.0 and their relaxation
+      id: run_chgnet
       if: env.valid == 'true'
       run: |
         python featurization/chgnet-minimal.py | tee -a log.txt
         zip -r -9 structures_relaxed.zip structures_relaxed | tee -a log.txt
 
     - name: Run another step if Python step fails
-      if: failure()
+      if: steps.run_chgnet.outcome == 'failure'
       uses: actions/github-script@v7
       with:
         script: |
