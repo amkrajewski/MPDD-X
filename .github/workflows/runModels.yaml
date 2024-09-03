@@ -98,24 +98,36 @@ jobs:
       run: |
         shopt -s nocasematch
         if [ ! -d "structures" ]; then
-           echo "structures directory does not exist"
-           echo "valid=false" >> $GITHUB_ENV
-           exit 0
+          echo "structures directory does not exist"
+          echo "valid=false" >> $GITHUB_ENV
+          exit 0
         fi
         if [ -z "$(ls -A structures)" ]; then
-           echo "No files found in structures directory"
-           echo "valid=false" >> $GITHUB_ENV
-           exit 0
+          echo "No files found in structures directory"
+          echo "valid=false" >> $GITHUB_ENV
+          exit 0
         fi
         for file in structures/*; do
           extension="${file##*.}"
-          if [[ "$extension" != "poscar" && "$extension" != "cif" && "$extension" != "vasp" ]]; then
+          if [[ "$extension" != "poscar" && "$extension" != "cif" && "$extension" != "vasp" && 
+                "$extension" != "POSCAR" && "$extension" != "CIF" && "$extension" != "VASP" ]]; then
             echo "Invalid file extension: $file"
             echo "valid=false" >> $GITHUB_ENV
             exit 0
           fi
         done
         echo "valid=true" >> $GITHUB_ENV
+  
+    - name: Rename files to uppercase extensions
+      if: env.valid == 'true'
+      run: |
+        for file in structures/*; do
+          filename=$(basename "$file")
+          extension="${filename##*.}"
+          newname="${filename%.*}.${extension^^}"
+          mv "$file" "structures/$newname"
+        done
+        echo "Files renamed to uppercase extensions"
         
     - name: Send message if file extensions are invalid
       uses: actions/github-script@v7
@@ -123,7 +135,7 @@ jobs:
       with:
         script: |
           const issue = context.issue;
-          const message = '😢 The files supplied in ZIP do not have one of the required extensions: `CIF` or `POSCAR` (or `VASP`). If you need another format to work, let us know!';
+          const message = '😢 The files supplied in ZIP do not have one of the required extensions: `cif`/`CIF`, `poscar`/`POSCAR`, or `vasp`/`VASP`). If you need another format to work, let us know!';
 
           github.rest.issues.createComment({
             owner: issue.owner,
