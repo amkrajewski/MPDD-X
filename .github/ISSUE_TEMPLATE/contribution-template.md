@@ -1,5 +1,5 @@
 ---
-name: Data Contribution from Structure Files
+name: 🌟 Run MPDD-X on Structure Files (Data Contribution)
 about: Placed here just to say no content is needed to get started!
 title: "[IN]"
 labels: contrib

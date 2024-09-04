@@ -1,5 +1,5 @@
 ---
-name: ML Model Addition to the MPDD Ecosystem
+name: Request Addition of ML Model to the MPDD Ecosystem (Expert)
 about: Template for requesting to add a new model into the MPDD ecosystem.
 title: "[ENH]"
 labels: enhancement
