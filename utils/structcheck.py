@@ -10,8 +10,13 @@ structures, names = [], []
 files = os.listdir('structures')
 files = natsort.natsorted(files)
 for file in files:
-    s = Structure.from_file(f'structures/{file}')
+    try:
+        s = Structure.from_file(f'structures/{file}')
+    except Exception as e:
+        print(f"An error occurred: {str(e)}", file=sys.stderr)
+        sys.exit(1)
     if s.is_valid(tol=0.1) and s.is_ordered and s.composition.valid:
+        print(f"The structure was not valid, not ordered, or not occupied by a valid compositon.")
         structures.append(s)
         names.append(file)
     else:

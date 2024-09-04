@@ -200,6 +200,10 @@ jobs:
       if: env.valid == 'true'
       run: |
         python utils/structcheck.py | tee -a log.txt
+        if [ ! -f "structureList.md" ]; then
+          echo "Error: structureList.md was not produced. Structure checking has failed at some point."
+          exit 1
+        fi
 
     - name: Run another step if Python step fails
       if: steps.check_structures.outcome == 'failure'
