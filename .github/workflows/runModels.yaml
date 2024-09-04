@@ -351,6 +351,7 @@ jobs:
         tar -c structures structures_relaxed response_pySIPFENN.md response_ALIGNN.md response_CHGNet.md descriptorData.npy results.csv log.txt structureList.md  | 7z a -si -tgzip -mx=9 "contributions/contrib_${issue_number}.tar.gz"
     
     - name: Check calculations and required files
+      id: calculations_check
       continue-on-error: true
       run: |
         ERRORS=()
