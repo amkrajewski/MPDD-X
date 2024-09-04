@@ -345,14 +345,33 @@ jobs:
         echo "${issue_number}"
         tar -c structures structures_relaxed response_pySIPFENN.md response_ALIGNN.md response_CHGNet.md descriptorData.npy results.csv log.txt structureList.md  | 7z a -si -tgzip -mx=9 "contributions/contrib_${issue_number}.tar.gz"
     
-    - name: Check calculation steps and cancel workflow if any failed
+    - name: Check calculations and required files
       if: always()
-      id: calculations_check
       run: |
-        if [[ ${{ steps.run_pysipfenn.outcome }} == 'failure' || 
-              ${{ steps.run_alignn.outcome }} == 'failure' || 
-              ${{ steps.run_chgnet.outcome }} == 'failure' ]]; then
-          echo "One or more calculation steps failed. Cancelling workflow."
+        ERRORS=()
+        
+        # Check calculation steps
+        if [[ "${{ steps.run_pysipfenn.outcome }}" == 'failure' ]]; then
+          ERRORS+=("pySIPFENN calculation failed")
+        fi
+        if [[ "${{ steps.run_alignn.outcome }}" == 'failure' ]]; then
+          ERRORS+=("ALIGNN calculation failed")
+        fi
+        if [[ "${{ steps.run_chgnet.outcome }}" == 'failure' ]]; then
+          ERRORS+=("CHGNet calculation failed")
+        fi
+        
+        # Check for required files
+        for file in response_pySIPFENN.md response_ALIGNN.md response_CHGNet.md; do
+          if [[ ! -f "$file" ]]; then
+            ERRORS+=("$file is missing")
+          fi
+        done
+        
+        # Report errors and exit if any
+        if [ ${#ERRORS[@]} -ne 0 ]; then
+          echo "Errors detected:"
+          printf ' - %s\n' "${ERRORS[@]}"
           exit 1
         fi
           
