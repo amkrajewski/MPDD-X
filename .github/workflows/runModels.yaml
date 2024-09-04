@@ -206,14 +206,14 @@ jobs:
           exit 1
         fi
 
-    - name: Run another step if Python step fails
+    - name: Report if the structure checking step has failed
       if: steps.check_structures.outcome == 'failure'
       uses: actions/github-script@v7
       with:
         script: |
           const issue = context.issue;
           const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-          const message = '😢 I tried to read provided structure files and perform symmetry analysis, but something went wrong...\nYou can see detailed logs for this run here: ${runUrl}`;
+          const message = `😢 I tried to read provided structure files and perform symmetry analysis, but something went wrong...\nYou can see detailed logs for this run here: ${runUrl}`;
 
           github.rest.issues.createComment({
             owner: issue.owner,
@@ -243,7 +243,7 @@ jobs:
         script: |
           const issue = context.issue;
           const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-          const message = '😢 Something went wrong at the pySIPFENN calculation step...\nYou can see detailed logs for this run here: ${runUrl}`;
+          const message = `😢 Something went wrong at the pySIPFENN calculation step...\nYou can see detailed logs for this run here: ${runUrl}`;
 
           github.rest.issues.createComment({
             owner: issue.owner,
@@ -265,7 +265,7 @@ jobs:
         script: |
           const issue = context.issue;
           const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-          const message = '😢 Something went wrong at the ALIGNN calculation step...\nYou can see detailed logs for this run here: ${runUrl}`;
+          const message = `😢 Something went wrong at the ALIGNN calculation step...\nYou can see detailed logs for this run here: ${runUrl}`;
 
           github.rest.issues.createComment({
             owner: issue.owner,
@@ -288,7 +288,7 @@ jobs:
         script: |
           const issue = context.issue;
           const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-          const message = '😢 Something went wrong at the CHGNet calculation step...\nYou can see detailed logs for this run here: ${runUrl}`;
+          const message = `😢 Something went wrong at the CHGNet calculation step...\nYou can see detailed logs for this run here: ${runUrl}`;
 
           github.rest.issues.createComment({
             owner: issue.owner,
@@ -351,7 +351,6 @@ jobs:
         tar -c structures structures_relaxed response_pySIPFENN.md response_ALIGNN.md response_CHGNet.md descriptorData.npy results.csv log.txt structureList.md  | 7z a -si -tgzip -mx=9 "contributions/contrib_${issue_number}.tar.gz"
     
     - name: Check calculations and required files
-      if: always()
       continue-on-error: true
       run: |
         ERRORS=()
