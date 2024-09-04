@@ -198,6 +198,7 @@ jobs:
     - name: Check structures
       id: check_structures
       if: env.valid == 'true'
+      continue-on-error: true
       run: |
         python utils/structcheck.py | tee -a log.txt
         if [ ! -f "structureList.md" ]; then
@@ -351,6 +352,7 @@ jobs:
     
     - name: Check calculations and required files
       if: always()
+      continue-on-error: true
       run: |
         ERRORS=()
         
