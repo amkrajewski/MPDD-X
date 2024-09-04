@@ -3,14 +3,19 @@ from pymatgen.core import Structure
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 import natsort
 import os
+import sys
 print('\n\n\nImporting Structures...', flush=True)
 
 structures, names = [], []
 files = os.listdir('structures')
 files = natsort.natsorted(files)
 for file in files:
-    structures.append(Structure.from_file(f'structures/{file}'))
-    names.append(file)
+    s = Structure.from_file(f'structures/{file}')
+    if s.is_valid(tol=0.1) and s.is_ordered and s.composition.valid:
+        structures.append(s)
+        names.append(file)
+    else:
+        sys.exit(1)
 print(f'Found {len(structures)} structures.\nPerforming a quick analysis.', flush=True)
 outString = "Structure Record:\n"
 outString += f'| Name | Formula | Crytal Family | Space Group | Volume per Atom |\n'
