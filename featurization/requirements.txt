@@ -6,7 +6,7 @@ spglib==2.0.2
 pymongo>=4.6.3
 chgnet==0.3.4
 natsort
-dgl>=2.0.0
+dgl==2.0.0
 torch>=2.0.0
 
 # torch and dgl already installed by specifying specific torch cpu version to use and matching dgl to it from their index
